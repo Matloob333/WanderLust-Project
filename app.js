@@ -31,8 +31,7 @@ const app = express();
 async function connectToDB() {
   try {
     await mongoose.connect(MONGO_Url, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    
     });
     console.log("Connected to MongoDB");
   } catch (err) {
@@ -54,7 +53,7 @@ app.use(cookieParser());
 
 // Session store
 const store = MongoStore.create({
-  mongoUrl: dbUrl,
+  mongoUrl: MONGO_Url,
   crypto: {
     secret: process.env.SESSION_SECRET,
   },
