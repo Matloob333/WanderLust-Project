@@ -1,16 +1,25 @@
 const mongoose = require("mongoose");
-const initData = require("./data.js"); // Ensure the data is imported correctly
+const initData = require("./data.js");
 const Listing = require("../models/listing.js");
-const Review = require("../models/review.js"); // Import the Review model
+const Review = require("../models/review.js");
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+// Load environment variables
+require('dotenv').config();
+
+// Make sure the MONGO_URL is correctly loaded from the environment variable
+const MONGO_URL = process.env.ATLASDB_URL;
+
+if (!MONGO_URL) {
+  console.error("MongoDB connection string is not defined. Please check your .env file.");
+  process.exit(1);
+}
 
 // Connect to MongoDB and initialize data
 main()
   .then(async () => {
     console.log("Connected to DB");
-    await clearReviews(); // Clear reviews after DB connection
-    await initDB(); // Call the initDB function after clearing reviews
+    await clearReviews(); 
+    await initDB(); 
   })
   .catch((err) => {
     console.error("Error connecting to DB:", err);
@@ -24,20 +33,20 @@ async function main() {
     });
   } catch (error) {
     console.error("Error in main:", error);
-    process.exit(1); // Exit process with a failure code
+    process.exit(1);
   }
 }
 
 const initDB = async () => {
   try {
-    await Listing.deleteMany({}); // Clear existing listings
+    await Listing.deleteMany({});
     initData.data = initData.data.map((obj) => ({
       ...obj,
-      owner: "679502fe2535ba48ea3d29b4", // Update the owner field in the data
+      owner: "679502fe2535ba48ea3d29b4", 
     }));
     console.log(initData.data);
-    
-    await Listing.insertMany(initData.data); // Insert new data
+
+    await Listing.insertMany(initData.data);
     console.log("Data was initialized successfully");
   } catch (error) {
     console.error("Error during database initialization:", error);
@@ -53,7 +62,6 @@ const clearReviews = async () => {
   }
 };
 
-// If you want to call these functions during your test setup or teardown
-// Ensure to export them if necessary
 module.exports = { clearReviews, initDB };
 initDB();
+

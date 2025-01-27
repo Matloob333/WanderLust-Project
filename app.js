@@ -22,7 +22,11 @@ const reviewsRouter = require("./routes/review");
 const userRouter = require("./routes/user");
 
 // MongoDB connection string
-const MONGO_Url = process.env.ATLASDB_URL ||"mongodb+srv://matloobahmad6386:hEUuwdy2xgQhNdOg@cluster0.5yqco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_Url = process.env.ATLASDB_URL;
+if (!MONGO_Url) {
+  console.error("MongoDB connection string is not defined. Please check your .env file.");
+  process.exit(1); // Exit process if no MONGO_Url is defined
+}
 
 // Initialize Express app
 const app = express();
@@ -31,16 +35,19 @@ const app = express();
 async function connectToDB() {
   try {
     await mongoose.connect(MONGO_Url, {
-    
+      
     });
     console.log("Connected to MongoDB");
   } catch (err) {
     console.error("Database connection error:", err);
+    process.exit(1); // Exit the app if DB connection fails
   }
 }
 connectToDB();
 
 // App configuration
+app.use(express.json()); // Parse JSON request bodies
+
 app.set("view engine", "ejs"); // Set EJS as the templating engine
 app.set("views", path.join(__dirname, "views")); // Set the views directory
 app.engine("ejs", ejsMate); // Use ejs-mate for layouts
@@ -55,7 +62,7 @@ app.use(cookieParser());
 const store = MongoStore.create({
   mongoUrl: MONGO_Url,
   crypto: {
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET, // Fallback secret if not in .env
   },
   touchAfter: 24 * 3600, // Update only once in a 24-hour window
 });
@@ -66,14 +73,18 @@ store.on("error", (err) => {
 
 // Session and Flash configuration
 const sessionOptions = {
-  store,
-  secret: process.env.SESSION_SECRET || "mysupersecretcode",
+  store: MongoStore.create({
+    mongoUrl: MONGO_Url,
+    crypto: {
+      secret: process.env.SESSION_SECRET, // Ensure the session secret is set consistently
+    },
+  }),
+  secret: process.env.SESSION_SECRET || "mysupersecretcode", // Session secret
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
-    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
   },
 };
 
@@ -109,6 +120,19 @@ app.all("*", (req, res, next) => {
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong!" } = err;
   res.status(status).render("error", { message }); // Ensure 'error.ejs' exists in the 'views' folder
+});
+
+app.use((req, res, next) => {
+  if (req.session) {
+    req.session.destroy((err) => {
+      if (err) {
+        console.log("Error clearing session:", err);
+      } else {
+        console.log("Session cleared!");
+      }
+    });
+  }
+  next();
 });
 
 // Start the server
