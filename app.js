@@ -79,7 +79,7 @@ const sessionOptions = {
       secret: process.env.SESSION_SECRET, // Ensure the session secret is set consistently
     },
   }),
-  secret: process.env.SESSION_SECRET || "mysupersecretcode", // Session secret
+  secret: process.env.SESSION_SECRET, // Session secret
   resave: false,
   saveUninitialized: true,
   cookie: {
