@@ -1,64 +1,32 @@
 const express = require("express");
-const { model } = require("mongoose");
-const { route } = require("./listing");
 const router = express.Router({ mergeParams: true });
 const User = require("../models/users");
-const wrapAsync = require("../util/wrapAsync");
+const wrapAsync = require("../errorhandlers/wrapAsync");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware");
+const userController = require("../controllers/user");
 
-router.get("/signup", (req, res) => {
-  res.render("users/signup.ejs");
-});
-
-router.post(
-  "/signup",
-  wrapAsync(async (req, res) => {
-    try {
-      let { username, email, password } = req.body;
-      const newUser = new User({ email, username });
-      const registeredUser = await User.register(newUser, password);
-      console.log(registeredUser);
-      req.logIn(registeredUser,(err)=>{
-        if(err){
-            return next(err);
-        }
-        req.flash("success", "Welcome to WanderLust!");
-        res.redirect("/listings");
-      });
-     
-    } catch (e) {
-      req.flash("error", e.message);
-      res.redirect("/signup");
-    }
-  })
+// Sign Up Route - Display sign-up form
+router.route("/signup")
+.get( userController.renderSignUpForm)
+.post(
+  wrapAsync(userController.signUp)
 );
 
-router.get("/login", (req, res) => {
-  res.render("users/login.ejs");
-});
-
-router.post(
-  "/login",
+// Login Route - Display login form
+router
+.route("/login")
+.get( userController.renderLogInForm)
+.post(
   saveRedirectUrl,
   passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true,
   }),
-  async (req, res) => {
-    req.flash("success", "Welcome back to WanderLust!"); 
-    let redirectUrl=res.locals.redirectUrl||"/listings";
-    res.redirect(redirectUrl);
-  }
+userController.logIn
 );
 
-router.get("/logout",(req,res,next)=>{
-    req.logOut((err)=>{
-        if(err){
-           return next(err);
-        }
-        req.flash("success","you are logged out!");
-        res.redirect("/listings");
-    })
-})
+// Logout Route - Log out the user and redirect to listings
+router.get("/logout", userController.logOut);
+
 module.exports = router;

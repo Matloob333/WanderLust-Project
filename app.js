@@ -1,42 +1,45 @@
+require('dotenv').config();
+
 // Import required modules
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const cookieParser=require("cookie-parser");
-const session=require("express-session");
-const flash=require("connect-flash");
-const passport=require("passport");
-const LocalStrategy=require("passport-local");
-const passportLocalMongoose=require("passport-local-mongoose");
-const User=require("./models/users.js");
-
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/users");
 
 // Import models and utilities
-const ExpressError = require("./util/ExpressError.js");
+const ExpressError = require("./errorhandlers/ExpressError");
 
-const listingsRouter = require("./routes/listing.js");
-const reviewsRouter = require("./routes/review.js");
-const userRouter=require("./routes/user.js");
+const listingsRouter = require("./routes/listing");
+const reviewsRouter = require("./routes/review");
+const userRouter = require("./routes/user");
 
 // MongoDB connection string
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+const dbUrl = process.env.ATLASDB_URL ;
 
 // Initialize Express app
 const app = express();
 
 // Connect to MongoDB
-async function main() {
-  await mongoose.connect(MONGO_URL);
+async function connectToDB() {
+  try {
+    await mongoose.connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("Database connection error:", err);
+  }
 }
-main()
-  .then(() => {
-    console.log("Connected to DB");
-  })
-  .catch((err) => {
-    console.log("Database connection error:", err);
-  });
+connectToDB();
 
 // App configuration
 app.set("view engine", "ejs"); // Set EJS as the templating engine
@@ -46,76 +49,57 @@ app.engine("ejs", ejsMate); // Use ejs-mate for layouts
 // Middleware
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 app.use(methodOverride("_method")); // Support method override for PUT and DELETE
-app.use(express.static(path.join(__dirname, "/public"))); // Serve static files
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files
+app.use(cookieParser());
 
-const sessionOption={
-  secret:"mysupersecretcode",
-  resave:false,
-  saveUninitialized:true,
-  cookie:{
-    expires:Date.now()+7*24*60*60*1000,
-    maxAge:7*24*60*60*1000,
-    httpOnly:true,
-  }
-};
-
-
-// Root route
-app.get("/", (req, res) => {
-  res.send("Hi, I am the root");
+// Session store
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: process.env.SESSION_SECRET || "mysupersecretcode",
+  },
+  touchAfter: 24 * 3600, // Update only once in a 24-hour window
 });
 
+store.on("error", (err) => {
+  console.log("Error in MongoDB session store:", err);
+});
 
+// Session and Flash configuration
+const sessionOptions = {
+  store,
+  secret: process.env.SESSION_SECRET || "mysupersecretcode",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// session flash message middleware
-app.use(session(sessionOption));
+app.use(session(sessionOptions));
 app.use(flash());
 
-//passport middlewares pbkdf2 hashing algo used
+// Passport configuration
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate));
-
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// middleware for flash messages
-app.use((req,res,next)=>{
-  res.locals.success=req.flash("success");
-  res.locals.error=req.flash("error");
-  res.locals.currUser=req.user;
-    next();
+// Flash and current user middleware
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
+  next();
 });
 
-
-
+// Routes
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
-app.use("/",userRouter);
+app.use("/", userRouter);
 
 // Handle undefined routes
 app.all("*", (req, res, next) => {
@@ -125,10 +109,11 @@ app.all("*", (req, res, next) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something went wrong!" } = err;
-  res.status(status).render("listings/error.ejs", { message });
+  res.status(status).render("error", { message }); // Ensure 'error.ejs' exists in the 'views' folder
 });
 
 // Start the server
-app.listen(8080, () => {
-  console.log("Server is listening on port 8080");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });

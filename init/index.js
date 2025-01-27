@@ -9,7 +9,8 @@ const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 main()
   .then(async () => {
     console.log("Connected to DB");
-    await initDB(); // Call the initDB function after the DB connection is established
+    await clearReviews(); // Clear reviews after DB connection
+    await initDB(); // Call the initDB function after clearing reviews
   })
   .catch((err) => {
     console.error("Error connecting to DB:", err);
@@ -23,15 +24,19 @@ async function main() {
     });
   } catch (error) {
     console.error("Error in main:", error);
-    process.exit(1);
+    process.exit(1); // Exit process with a failure code
   }
 }
 
 const initDB = async () => {
   try {
     await Listing.deleteMany({}); // Clear existing listings
-    initData.data=initData.data.map((obj)=>({...obj,owner:"677a34f6392a34c436e2d3c4"}))
+    initData.data = initData.data.map((obj) => ({
+      ...obj,
+      owner: "679502fe2535ba48ea3d29b4", // Update the owner field in the data
+    }));
     console.log(initData.data);
+    
     await Listing.insertMany(initData.data); // Insert new data
     console.log("Data was initialized successfully");
   } catch (error) {
@@ -39,7 +44,6 @@ const initDB = async () => {
   }
 };
 
-// Functions for test setup/teardown
 const clearReviews = async () => {
   try {
     await Review.deleteMany({});
@@ -49,7 +53,7 @@ const clearReviews = async () => {
   }
 };
 
-// Use these functions in your test setup or teardown
-// For example:
-clearReviews(); // Call before or after each test
+// If you want to call these functions during your test setup or teardown
+// Ensure to export them if necessary
+module.exports = { clearReviews, initDB };
 initDB();

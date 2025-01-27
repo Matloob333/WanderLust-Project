@@ -1,48 +1,52 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const Review = require("./review"); // Ensure the review model is correctly exported and imported
+const Review = require("./review"); // Ensure the review model is properly exported
 
 const listingSchema = new Schema({
   title: {
     type: String,
-    required: [true, "Title is required"], // Validation for title
-    trim: true, // Removes extra spaces
+    required: [true, "Title is required"], // Add a custom error message for required validation
+    trim: true,
   },
   description: {
     type: String,
-    trim: true, // Removes extra spaces
+    trim: true,
   },
   image: {
-    type: String,
-    default:
-      "https://images.pexels.com/photos/45853/grey-crowned-crane-bird-crane-animal-45853.jpeg?auto=compress&cs=tinysrgb&w=600", // Default image URL
-    set: function (v) {
-      return v && v.trim() !== "" ? v : undefined; // Use undefined to trigger the default value
+    url: {
+      type: String,
+      required: [true, "Image URL is required"],
+    },
+    filename: {
+      type: String,
+      required: [true, "Image filename is required"],
     },
   },
   price: {
     type: Number,
-    required: [true, "Price is required"], // Validation for price
-    min: [0, "Price cannot be negative"], // Ensures non-negative values
+    required: [true, "Price is required"], // Custom validation message
+    min: [0, "Price must be a positive number"], // Ensures no negative prices
   },
   location: {
     type: String,
-    trim: true, // Removes extra spaces
+    trim: true,
+    required: [true, "Location is required"],
   },
   country: {
     type: String,
-    trim: true, // Removes extra spaces
+    trim: true,
+    required: [true, "Country is required"],
   },
   reviews: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Review", // Correct model reference
+      ref: "Review", // Reference to the Review model
     },
   ],
   owner: {
     type: Schema.Types.ObjectId,
-    ref: "User", // Ensure "User" model is correctly registered
-    // Validation for owner
+    ref: "User", // Reference to the User model
+    required: [true, "Owner is required"], // Ensure every listing has an owner
   },
 });
 
@@ -50,9 +54,11 @@ const listingSchema = new Schema({
 listingSchema.post("findOneAndDelete", async function (listing) {
   if (listing) {
     try {
+      // Delete all reviews associated with this listing
       await Review.deleteMany({ _id: { $in: listing.reviews } });
+      console.log(`Successfully deleted reviews associated with listing ID: ${listing._id}`);
     } catch (error) {
-      console.error("Error deleting associated reviews:", error);
+      console.error(`Error deleting reviews for listing ID ${listing._id}:`, error);
     }
   }
 });

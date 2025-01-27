@@ -60,6 +60,7 @@ min-height: 100vh;
  .listing-card{
     border: none !important;
     margin-bottom: 2rem;
+    
  }
  .card-img-top{
     border-radius: 1rem !important;
@@ -69,6 +70,7 @@ min-height: 100vh;
  }
  .card-body{
     padding: 0 !important;
+    
  }
  .card-text p{
     font: weight 400 !important; 
