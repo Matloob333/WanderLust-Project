@@ -22,7 +22,7 @@ const reviewsRouter = require("./routes/review");
 const userRouter = require("./routes/user");
 
 // MongoDB connection string
-const dbUrl = process.env.ATLASDB_URL ||"ATLASDB_URL=mongodb+srv://matloobahmad6386:hEUuwdy2xgQhNdOg@cluster0.5yqco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_Url = process.env.ATLASDB_URL ||"mongodb+srv://matloobahmad6386:hEUuwdy2xgQhNdOg@cluster0.5yqco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Initialize Express app
 const app = express();
@@ -30,7 +30,7 @@ const app = express();
 // Connect to MongoDB
 async function connectToDB() {
   try {
-    await mongoose.connect(dbUrl, {
+    await mongoose.connect(MONGO_Url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
