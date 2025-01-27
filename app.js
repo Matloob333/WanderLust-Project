@@ -22,7 +22,7 @@ const reviewsRouter = require("./routes/review");
 const userRouter = require("./routes/user");
 
 // MongoDB connection string
-const dbUrl = process.env.ATLASDB_URL ;
+const dbUrl = process.env.ATLASDB_URL ||"ATLASDB_URL=mongodb+srv://matloobahmad6386:hEUuwdy2xgQhNdOg@cluster0.5yqco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Initialize Express app
 const app = express();
@@ -56,7 +56,7 @@ app.use(cookieParser());
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
-    secret: process.env.SESSION_SECRET || "mysupersecretcode",
+    secret: process.env.SESSION_SECRET,
   },
   touchAfter: 24 * 3600, // Update only once in a 24-hour window
 });
