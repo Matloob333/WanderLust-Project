@@ -5,7 +5,7 @@ const Review = require("./review"); // Ensure the review model is properly expor
 const listingSchema = new Schema({
   title: {
     type: String,
-    required: [true, "Title is required"], // Add a custom error message for required validation
+     // Add a custom error message for required validation
     trim: true,
   },
   description: {
