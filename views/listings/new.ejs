@@ -1,47 +1,103 @@
-<% layout("/layouts/boilerplate")%>
+<% layout("/layouts/boilerplate") %>
 <div class="row mt-3">
-      <div class="col-8 offset-2">
-        <br><br>
-
+  <div class="col-8 offset-2">
+    <br><br>
     <h3><b>Create a New Listing</b></h3>
-    <form action="/listings" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
+    <form 
+      action="/listings" 
+      method="POST" 
+      class="needs-validation" 
+      novalidate 
+      enctype="multipart/form-data"
+    >
+      <!-- Title -->
       <div class="mb-3">
         <label for="title" class="form-label">Title</label>
-        <input name="listing[title] " placeholder="Add a catchy title"  class="form-control" >
+        <input 
+          id="title" 
+          name="listing[title]" 
+          placeholder="Add a catchy title" 
+          class="form-control" 
+          required
+        />
+        <div class="invalid-feedback">Please provide a title for the listing.</div>
         <div class="valid-feedback">Title looks good!</div>
       </div>
+
+      <!-- Description -->
       <div class="mb-3">
         <label for="description" class="form-label">Description</label>
         <textarea 
-        name="listing[description]"
-         id=""  class="form-control" required></textarea>
+          id="description" 
+          name="listing[description]" 
+          class="form-control" 
+          placeholder="Provide a detailed description" 
+          required
+        ></textarea>
+        <div class="invalid-feedback">Please provide a description.</div>
       </div>
-      
+
+      <!-- Image -->
       <div class="mb-3">
-        <label for="image" class="form-label"> Upload Image </label>
-        <input  name="listing[image]" type="file" class="form-control">
+        <label for="image" class="form-label">Upload Image</label>
+        <input 
+          id="image" 
+          name="listing[image]" 
+          type="file" 
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Please upload an image for the listing.</div>
       </div>
+
+      <!-- Price and Country -->
       <div class="row">
-        <div class="mb-3 col-md-4" >
+        <div class="mb-3 col-md-4">
           <label for="price" class="form-label">Price</label>
-          <input name="listing[price]" placeholder="1200"   class="form-control" required>
-          <div class="invalid-feedback">Please enter a valid price</div>
+          <input 
+            id="price" 
+            name="listing[price]" 
+            placeholder="1200" 
+            type="number" 
+            class="form-control" 
+            required
+          />
+          <div class="invalid-feedback">Please enter a valid price.</div>
         </div>
         <div class="mb-3 col-md-8">
           <label for="country" class="form-label">Country</label>
-          <input name="listing[country]" placeholder="India"  type="text" class="form-control" required>
+          <input 
+            id="country" 
+            name="listing[country]" 
+            placeholder="India" 
+            type="text" 
+            class="form-control" 
+            required
+          />
+          <div class="invalid-feedback">Please provide a country name.</div>
         </div>
       </div>
-      
+
+      <!-- Location -->
       <div class="mb-3">
         <label for="location" class="form-label">Location</label>
-        <input name="listing[location]" placeholder="Bareilly , Uttar Pradesh"  type="text" class="form-control" required>
+        <input 
+          id="location" 
+          name="listing[location]" 
+          placeholder="Bareilly, Uttar Pradesh" 
+          type="text" 
+          class="form-control" 
+          required
+        />
+        <div class="invalid-feedback">Please provide the location for the listing.</div>
       </div>
-     
+
+      <!-- Submit Button -->
       <div>
-        <button  class="btn btn-dark add-btn mb-3 mt-3">Add</button>
+        <button class="btn btn-dark add-btn mb-3 mt-3" type="submit">Add</button>
       </div>
-     </div>
     </form>
   </div>
-  <script src="/js/script.js"></script>
+</div>
+
+<script src="/js/script.js"></script>

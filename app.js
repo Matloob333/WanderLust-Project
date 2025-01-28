@@ -107,6 +107,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
+
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
@@ -136,7 +137,10 @@ app.use((req, res, next) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
+});
+app.get("/", (req, res) => {
+  res.send("Welcome to the homepage!");
 });

@@ -1,5 +1,6 @@
 const Listing = require("../models/listing");
 
+
 // Index route - Fetch and display all listings
 module.exports.index = async (req, res, next) => {
   try {
@@ -74,9 +75,12 @@ module.exports.renderEditForm = async (req, res, next) => {
       req.flash("error", "The listing you requested does not exist!");
       return res.redirect("/listings");
     }
-    let OriginalImageURl=  listing.image.url;
-    OriginalImageURl=OriginalImageURl.replace("/upload","/upload/h_300,w_250");
-    res.render("listings/edit", { listing,OriginalImageURl });
+    let OriginalImageUrl = listing.image.url;
+    OriginalImageUrl = OriginalImageUrl.replace(
+      "/upload",
+      "/upload/h_300,w_250  "
+    );
+    res.render("listings/edit", { listing, OriginalImageUrl });
   } catch (err) {
     next(err);
   }
