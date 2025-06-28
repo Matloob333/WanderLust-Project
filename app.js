@@ -122,7 +122,7 @@ passport.use(new LocalStrategy({
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   // Determine the callback URL based on environment
   const callbackURL = process.env.NODE_ENV === 'production' 
-    ? `${process.env.BASE_URL || 'https://your-app-name.onrender.com'}/auth/google/callback`
+    ? `${process.env.BASE_URL || 'https://wanderlust-project.onrender.com'}/auth/google/callback`
     : '/auth/google/callback';
 
   passport.use(new GoogleStrategy({

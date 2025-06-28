@@ -15,14 +15,14 @@ Go to [Google Cloud Console](https://console.cloud.google.com/) and:
 #### Authorized JavaScript origins:
 Add your deployed URL:
 ```
-https://your-app-name.onrender.com
+https://wanderlust-project.onrender.com
 http://localhost:8080 (keep for local development)
 ```
 
 #### Authorized redirect URIs:
 Add your deployed callback URL:
 ```
-https://your-app-name.onrender.com/auth/google/callback
+https://wanderlust-project.onrender.com/auth/google/callback
 http://localhost:8080/auth/google/callback (keep for local development)
 ```
 
@@ -33,7 +33,7 @@ In your Render dashboard, go to your service and add these environment variables
 ```
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-BASE_URL=https://your-app-name.onrender.com
+BASE_URL=https://wanderlust-project.onrender.com
 NODE_ENV=production
 ATLASDB_URL=your_mongodb_connection_string
 SESSION_SECRET=your_session_secret
@@ -41,7 +41,7 @@ SESSION_SECRET=your_session_secret
 
 ### 3. Update Your App Name
 
-Replace `your-app-name` in the render.yaml file with your actual Render app name.
+The render.yaml file already has the correct app name: `wanderlust-project`
 
 ### 4. Common Issues and Solutions:
 
@@ -77,4 +77,11 @@ Replace `your-app-name` in the render.yaml file with your actual Render app name
 - [ ] Set BASE_URL in Render environment variables
 - [ ] Updated render.yaml with correct app name
 - [ ] Deployed the updated code
-- [ ] Tested Google login on deployed site 
+- [ ] Tested Google login on deployed site
+
+## IMPORTANT: Your Render App Name
+
+Your Render app is named: **wanderlust-project**
+Your deployed URL is: **https://wanderlust-project.onrender.com**
+
+Make sure to use these exact URLs in your Google OAuth console settings. 

@@ -205,15 +205,18 @@
                    class="card-img-top" 
                    alt="<%= listing.title %>"
                    loading="lazy" />
+              
+              <!-- Price Display on Hover -->
+              <div class="price-display">
+                <span class="price-amount">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                <span class="price-unit">/night</span>
+              </div>
+              
+              <!-- Category and Rating Info -->
               <div class="card-img-overlay d-flex align-items-end">
                 <div class="w-100">
                   <div class="bg-white bg-opacity-90 rounded-top p-3">
                     <h6 class="card-title mb-1"><%= listing.title %></h6>
-                    <p class="card-text mb-0">
-                      <strong class="text-primary fs-5">₹<%= listing.price.toLocaleString("en-IN") %></strong>
-                      <span class="text-muted">/night</span>
-                      <span class="tax-info text-muted ms-2">+18% GST</span>
-                    </p>
                     <div class="d-flex align-items-center mt-2">
                       <span class="badge bg-primary me-2"><%= listing.category %></span>
                       <% if (listing.rating > 0) { %>
