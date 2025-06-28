@@ -120,10 +120,15 @@ passport.use(new LocalStrategy({
 
 // Google OAuth Strategy
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  // Determine the callback URL based on environment
+  const callbackURL = process.env.NODE_ENV === 'production' 
+    ? `${process.env.BASE_URL || 'https://your-app-name.onrender.com'}/auth/google/callback`
+    : '/auth/google/callback';
+
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
+    callbackURL: callbackURL
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user already exists
@@ -164,6 +169,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     }
   }));
   console.log('Google OAuth strategy configured successfully');
+  console.log('Callback URL:', callbackURL);
 } else {
   console.warn('Google OAuth credentials not found. Google login will be disabled.');
 }
