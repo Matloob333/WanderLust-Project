@@ -15,12 +15,6 @@ module.exports.showBookingForm = wrapAsync(async (req, res) => {
     throw new ExpressError(404, "Listing not found!");
   }
 
-  // Check if user is trying to book their own listing
-  if (req.user._id.equals(listing.owner._id)) {
-    req.flash("error", "You cannot book your own listing!");
-    return res.redirect(`/listings/${id}`);
-  }
-
   res.render("bookings/new", { listing });
 });
 
@@ -75,7 +69,11 @@ module.exports.createBooking = wrapAsync(async (req, res) => {
   });
 
   if (existingBooking) {
-    throw new ExpressError(400, "This property is not available for the selected dates!");
+    // Get more details about the conflicting booking
+    await existingBooking.populate('user');
+    const conflictMessage = `This property is not available for the selected dates! There's already a ${existingBooking.bookingStatus} booking from ${existingBooking.checkIn.toLocaleDateString()} to ${existingBooking.checkOut.toLocaleDateString()}.`;
+    
+    throw new ExpressError(400, conflictMessage);
   }
 
   // Create booking
@@ -101,14 +99,8 @@ module.exports.createBooking = wrapAsync(async (req, res) => {
   if (!orderResult.success) {
     // If payment service is not configured, create a mock order for demo purposes
     if (orderResult.error === 'Payment service not configured') {
-      const mockOrder = {
-        id: `mock_order_${Date.now()}`,
-        amount: totalAmount * 100,
-        currency: 'INR'
-      };
-      
       // Update booking with mock order ID
-      booking.razorpayOrderId = mockOrder.id;
+      booking.razorpayOrderId = `mock_order_${Date.now()}`;
       await booking.save();
 
       // Populate listing data for payment form
@@ -116,7 +108,11 @@ module.exports.createBooking = wrapAsync(async (req, res) => {
 
       // Generate payment form data with mock order
       const paymentData = paymentService.generatePaymentFormData(
-        mockOrder,
+        {
+          id: `mock_order_${Date.now()}`,
+          amount: totalAmount * 100,
+          currency: 'INR'
+        },
         req.user,
         booking
       );
@@ -330,4 +326,64 @@ module.exports.getBookingStats = wrapAsync(async (req, res) => {
   };
 
   res.json(stats);
+});
+
+// Get available dates for a listing (API endpoint)
+module.exports.getAvailableDates = wrapAsync(async (req, res) => {
+  const { id } = req.params;
+  const { month, year } = req.query;
+  
+  const listing = await Listing.findById(id);
+  if (!listing) {
+    throw new ExpressError(404, "Listing not found!");
+  }
+
+  // Get the month and year to check
+  const checkDate = new Date(year || new Date().getFullYear(), month || new Date().getMonth(), 1);
+  const startOfMonth = new Date(checkDate.getFullYear(), checkDate.getMonth(), 1);
+  const endOfMonth = new Date(checkDate.getFullYear(), checkDate.getMonth() + 1, 0);
+
+  // Get existing bookings for this month
+  const existingBookings = await Booking.find({
+    listing: id,
+    bookingStatus: { $in: ["confirmed", "pending"] },
+    $or: [
+      {
+        checkIn: { $lte: endOfMonth },
+        checkOut: { $gte: startOfMonth }
+      }
+    ]
+  }).select('checkIn checkOut');
+
+  // Generate calendar data
+  const calendar = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let day = 1; day <= endOfMonth.getDate(); day++) {
+    const currentDate = new Date(checkDate.getFullYear(), checkDate.getMonth(), day);
+    const isPast = currentDate < today;
+    
+    // Check if this date is booked
+    const isBooked = existingBookings.some(booking => {
+      const bookingStart = new Date(booking.checkIn);
+      const bookingEnd = new Date(booking.checkOut);
+      return currentDate >= bookingStart && currentDate < bookingEnd;
+    });
+
+    calendar.push({
+      date: currentDate.toISOString().split('T')[0],
+      day: day,
+      isPast: isPast,
+      isBooked: isBooked,
+      isAvailable: !isPast && !isBooked
+    });
+  }
+
+  res.json({
+    success: true,
+    calendar: calendar,
+    month: checkDate.getMonth(),
+    year: checkDate.getFullYear()
+  });
 }); 

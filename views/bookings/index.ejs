@@ -98,7 +98,15 @@ function cancelBooking(bookingId) {
   if (confirm('Are you sure you want to cancel this booking?')) {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/bookings/${bookingId}/cancel`;
+    form.action = `/bookings/${bookingId}`;
+    
+    // Add method override for DELETE
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'DELETE';
+    form.appendChild(methodInput);
+    
     document.body.appendChild(form);
     form.submit();
   }
