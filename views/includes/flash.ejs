@@ -1,29 +1,44 @@
-<%if (success &&success.length){%>
-<div
-  class="alert alert-success alert-dismissible fade show col-6 offset-3"
-  role="alert"
->
-  <%=success %>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"
-  ></button>
-</div>
-<%}%>
+<% const _success = typeof success !== 'undefined' ? success : []; %>
+<% const _error = typeof error !== 'undefined' ? error : []; %>
+<% const _info = typeof info !== 'undefined' ? info : []; %>
+<% const _warning = typeof warning !== 'undefined' ? warning : []; %>
 
-<%if (error &&error.length){%>
-    <div
-      class="alert alert-danger alert-dismissible fade show col-6 offset-3"
-      role="alert"
-    >
-      <%=error %>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
-    </div>
-    <%}%>
+<% if (_success && _success.length) { %>
+<div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; border: none;">
+  <div class="d-flex align-items-center">
+    <i class="fa-solid fa-check-circle me-2" style="font-size: 1.2rem;"></i>
+    <span><%= _success %></span>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<% } %>
+
+<% if (_error && _error.length) { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px; border: none;">
+  <div class="d-flex align-items-center">
+    <i class="fa-solid fa-exclamation-triangle me-2" style="font-size: 1.2rem;"></i>
+    <span><%= _error %></span>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<% } %>
+
+<% if (_info && _info.length) { %>
+<div class="alert alert-info alert-dismissible fade show" role="alert" style="border-radius: 12px; border: none;">
+  <div class="d-flex align-items-center">
+    <i class="fa-solid fa-info-circle me-2" style="font-size: 1.2rem;"></i>
+    <span><%= _info %></span>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<% } %>
+
+<% if (_warning && _warning.length) { %>
+<div class="alert alert-warning alert-dismissible fade show" role="alert" style="border-radius: 12px; border: none;">
+  <div class="d-flex align-items-center">
+    <i class="fa-solid fa-exclamation-circle me-2" style="font-size: 1.2rem;"></i>
+    <span><%= _warning %></span>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<% } %>

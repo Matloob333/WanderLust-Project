@@ -1,0 +1,127 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-calendar-check me-2"></i>
+            Booking Details
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <!-- Booking Status -->
+          <div class="alert alert-success mb-4">
+            <h5 class="mb-2">
+              <i class="fas fa-check-circle me-2"></i>
+              Booking Confirmed!
+            </h5>
+            <p class="mb-0">Your booking has been successfully confirmed. You will receive a confirmation email shortly.</p>
+          </div>
+
+          <!-- Property Details -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <img src="<%= booking.listing.image.url %>" alt="<%= booking.listing.title %>" class="img-fluid rounded">
+            </div>
+            <div class="col-md-8">
+              <h4 class="text-primary"><%= booking.listing.title %></h4>
+              <p class="text-muted mb-3">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <%= booking.listing.location %>
+              </p>
+              
+              <div class="row">
+                <div class="col-6">
+                  <p class="mb-1"><strong>Check-in:</strong></p>
+                  <p class="text-muted"><%= new Date(booking.checkIn).toLocaleDateString() %></p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1"><strong>Check-out:</strong></p>
+                  <p class="col-6 text-muted"><%= new Date(booking.checkOut).toLocaleDateString() %></p>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-6">
+                  <p class="mb-1"><strong>Guests:</strong></p>
+                  <p class="text-muted"><%= booking.numberOfGuests %> <%= booking.numberOfGuests === 1 ? 'Guest' : 'Guests' %></p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1"><strong>Booking ID:</strong></p>
+                  <p class="text-muted"><%= booking._id %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Details -->
+          <div class="bg-light p-3 rounded mb-4">
+            <h6 class="text-primary mb-3">
+              <i class="fas fa-credit-card me-2"></i>
+              Payment Information
+            </h6>
+            <div class="row">
+              <div class="col-6">Total Amount</div>
+              <div class="col-6 text-end fw-bold text-success">₹<%= booking.totalAmount %></div>
+            </div>
+            <div class="row">
+              <div class="col-6">Payment Status</div>
+              <div class="col-6 text-end">
+                <span class="badge bg-success">Paid</span>
+              </div>
+            </div>
+            <% if (booking.razorpayPaymentId) { %>
+            <div class="row">
+              <div class="col-6">Payment ID</div>
+              <div class="col-6 text-end text-muted"><%= booking.razorpayPaymentId %></div>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Special Requests -->
+          <% if (booking.specialRequests) { %>
+          <div class="mb-4">
+            <h6 class="text-primary mb-2">
+              <i class="fas fa-comment me-2"></i>
+              Special Requests
+            </h6>
+            <p class="text-muted"><%= booking.specialRequests %></p>
+          </div>
+          <% } %>
+
+          <!-- Actions -->
+          <div class="text-center">
+            <a href="/bookings" class="btn btn-outline-primary me-3">
+              <i class="fas fa-list me-2"></i>
+              View All Bookings
+            </a>
+            <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-secondary me-3">
+              <i class="fas fa-home me-2"></i>
+              View Property
+            </a>
+            <% if (new Date(booking.checkIn) > new Date()) { %>
+            <button class="btn btn-outline-danger" onclick="cancelBooking('<%= booking._id %>')">
+              <i class="fas fa-times me-2"></i>
+              Cancel Booking
+            </button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function cancelBooking(bookingId) {
+  if (confirm('Are you sure you want to cancel this booking?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/bookings/${bookingId}/cancel`;
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script> 

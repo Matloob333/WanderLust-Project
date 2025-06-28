@@ -1,142 +1,401 @@
-<% layout('/layouts/boilerplate') %> <%= success%>
-<body>
-  <style>
-    #filters {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .filter {
-      text-align: center;
-      margin-right: 2rem;
-      margin-top: 2rem;
-      opacity: 0.7;
-    }
-    .filter:hover {
-      opacity: 1;
-      cursor: pointer;
-    }
-    .filter p {
-      font-size: 0.8rem;
-    }
-    .tax-info {
-      display: none;
-    }
-    .tax-toggle {
-      border: 1px solid black;
-      border-radius: 1rem;
-      padding: 1rem;
-      height: 3.25rem;
-      display: flex;
-      align-items: center;
-      margin-left: 2rem;
-    }
-  </style>
-  <div id="filters">
-    <div class="filter">
-      <div><i class="fa-solid fa-fire"></i></div>
-      <p>Trending</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-bed"></i></div>
-      <p>Rooms</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-mountain-city"></i></div>
-      <p>Iconic Cities</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-mountain"></i></div>
-      <p>Mountains</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-brands fa-fort-awesome"></i></div>
-      <p>Castles</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-person-swimming"></i></div>
-      <p>Amazing Pools</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-campground"></i></div>
-      <p>Camping</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-cow"></i></div>
-      <p>Farms</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-regular fa-snowflake"></i></div>
-      <p>Arctic</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-igloo"></i></div>
-      <p>Domes</p>
-    </div>
-    <div class="filter">
-      <div><i class="fa-solid fa-ship"></i></div>
-      <p>Boats</p>
-    </div>
-    <!-- switch div -->
-    <div class="tax-toggle">
-      <div class="form-check-reverse form-switch">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="flexSwitchCheckDefault"
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefault"
-          >Display Total after Texes</label
-        >
+<% layout('/layouts/boilerplate') %>
+
+<!-- Hero Section -->
+<div class="hero-section mb-5">
+  <div class="container">
+    <div class="row align-items-center min-vh-50">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold mb-4">
+          <% if (typeof categoryTitle !== 'undefined' && categoryTitle) { %>
+            <%= categoryTitle %>
+          <% } else { %>
+            Discover Amazing Places
+            <span class="text-primary">Around the World</span>
+          <% } %>
+        </h1>
+        <p class="lead mb-4">
+          <% if (typeof categoryTitle !== 'undefined' && categoryTitle) { %>
+            Explore our curated collection of <%= categoryTitle.toLowerCase() %> accommodations.
+          <% } else { %>
+            Find unique accommodations, from cozy cabins to luxury villas. 
+            Create unforgettable memories with WanderLust.
+          <% } %>
+        </p>
+        <div class="d-flex gap-3">
+          <a href="/listings/new" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-plus me-2"></i>List Your Property
+          </a>
+          <a href="/listings/search" class="btn btn-outline-primary btn-lg">
+            <i class="fa-solid fa-search me-2"></i>Explore More
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-image">
+          <div class="position-relative">
+            <div class="bg-primary rounded-4 p-4" style="height: 300px; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+              <div class="text-white text-center h-100 d-flex flex-column justify-content-center">
+                <i class="fa-solid fa-compass fa-4x mb-3"></i>
+                <h3 class="fw-bold">Start Your Journey</h3>
+                <p class="mb-0">Find your perfect getaway today</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Uncomment this form if you want the 'Create New Listing' button -->
-  <!-- <form method="GET" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
-
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4 mt-3">
-    <% for(let listing of allListings) { %>
-    <div class="col card listing-card">
-      <a
-        href="/listings/<%= listing._id %>"
-        class="listing-link text-decoration-none"
-      >
-        <div class="card" style="width: 20rem">
-          <img
-            src="<%= listing.image.url %>"
-            class="card-img-top"
-            alt="Listing Image"
-            style="height: 20rem; object-fit: cover"
-          />
-          <div class="card-img-overlay"></div>
-          <div class="card-body">
-            <p class="card-text">
-              <b><%= listing.title %></b><br />
-              &#8377; <%= listing.price.toLocaleString("en-IN") %>/night
-              <i class="tax-info">&nbsp; +18% GST</i>
-            </p>
-          </div>
+<!-- Filters and Sort Section -->
+<div class="container mb-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Explore by Category</h4>
+        <div class="d-flex gap-3">
+          <!-- Category Filter -->
+          <select class="form-select" id="categoryFilter" style="width: auto;">
+            <option value="All" <%= selectedCategory === 'All' ? 'selected' : '' %>>All Categories</option>
+            <% if (typeof categories !== 'undefined') { %>
+              <% categories.forEach(category => { %>
+                <option value="<%= category %>" <%= selectedCategory === category ? 'selected' : '' %>><%= category %></option>
+              <% }); %>
+            <% } %>
+          </select>
+          
+          <!-- Sort Options -->
+          <select class="form-select" id="sortFilter" style="width: auto;">
+            <option value="newest" <%= selectedSort === 'newest' ? 'selected' : '' %>>Newest First</option>
+            <option value="price-low" <%= selectedSort === 'price-low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="price-high" <%= selectedSort === 'price-high' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="rating" <%= selectedSort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+          </select>
         </div>
-      </a>
+      </div>
+      
+      <!-- Category Cards -->
+      <div class="filters-grid">
+        <div class="filter-card" data-category="Beach">
+          <div class="filter-icon">
+            <i class="fa-solid fa-umbrella-beach"></i>
+          </div>
+          <span>Beach</span>
+        </div>
+        <div class="filter-card" data-category="Mountain">
+          <div class="filter-icon">
+            <i class="fa-solid fa-mountain"></i>
+          </div>
+          <span>Mountain</span>
+        </div>
+        <div class="filter-card" data-category="City">
+          <div class="filter-icon">
+            <i class="fa-solid fa-city"></i>
+          </div>
+          <span>City</span>
+        </div>
+        <div class="filter-card" data-category="Forest">
+          <div class="filter-icon">
+            <i class="fa-solid fa-tree"></i>
+          </div>
+          <span>Forest</span>
+        </div>
+        <div class="filter-card" data-category="Lake">
+          <div class="filter-icon">
+            <i class="fa-solid fa-water"></i>
+          </div>
+          <span>Lake</span>
+        </div>
+        <div class="filter-card" data-category="Island">
+          <div class="filter-icon">
+            <i class="fa-solid fa-island-tropical"></i>
+          </div>
+          <span>Island</span>
+        </div>
+        <div class="filter-card" data-category="Luxury">
+          <div class="filter-icon">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <span>Luxury</span>
+        </div>
+        <div class="filter-card" data-category="Adventure">
+          <div class="filter-icon">
+            <i class="fa-solid fa-hiking"></i>
+          </div>
+          <span>Adventure</span>
+        </div>
+        <div class="filter-card" data-category="Romantic">
+          <div class="filter-icon">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <span>Romantic</span>
+        </div>
+        <div class="filter-card" data-category="Family">
+          <div class="filter-icon">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <span>Family</span>
+        </div>
+        <div class="filter-card" data-category="Spa">
+          <div class="filter-icon">
+            <i class="fa-solid fa-spa"></i>
+          </div>
+          <span>Spa</span>
+        </div>
+        <div class="filter-card" data-category="Farm">
+          <div class="filter-icon">
+            <i class="fa-solid fa-cow"></i>
+          </div>
+          <span>Farm</span>
+        </div>
+      </div>
     </div>
-    <% } %>
   </div>
-</body>
+</div>
+
+<!-- Tax Toggle -->
+<div class="container mb-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="tax-toggle-card">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="taxToggle">
+          <label class="form-check-label" for="taxToggle">
+            <i class="fa-solid fa-calculator me-2"></i>
+            Display Total after Taxes
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Listings Grid -->
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h4 class="mb-4">
+        <% if (typeof categoryTitle !== 'undefined' && categoryTitle) { %>
+          <%= categoryTitle %>
+        <% } else { %>
+          All Listings
+        <% } %>
+        <span class="text-muted">(<%= allListings.length %> properties)</span>
+      </h4>
+    </div>
+  </div>
+  
+  <% if (allListings.length === 0) { %>
+    <div class="row">
+      <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No listings found</h4>
+        <p class="text-muted">Try adjusting your filters or search criteria</p>
+        <a href="/listings" class="btn btn-primary">View All Listings</a>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      <% for(let listing of allListings) { %>
+      <div class="col">
+        <div class="card listing-card h-100">
+          <a href="/listings/<%= listing._id %>" class="listing-link">
+            <div class="position-relative">
+              <img src="<%= listing.image.url %>" 
+                   class="card-img-top" 
+                   alt="<%= listing.title %>"
+                   loading="lazy" />
+              <div class="card-img-overlay d-flex align-items-end">
+                <div class="w-100">
+                  <div class="bg-white bg-opacity-90 rounded-top p-3">
+                    <h6 class="card-title mb-1"><%= listing.title %></h6>
+                    <p class="card-text mb-0">
+                      <strong class="text-primary">₹<%= listing.price.toLocaleString("en-IN") %></strong>
+                      <span class="text-muted">/night</span>
+                      <span class="tax-info text-muted ms-2">+18% GST</span>
+                    </p>
+                    <div class="d-flex align-items-center mt-2">
+                      <span class="badge bg-primary me-2"><%= listing.category %></span>
+                      <% if (listing.rating > 0) { %>
+                        <div class="d-flex align-items-center">
+                          <i class="fa-solid fa-star text-warning me-1"></i>
+                          <small><%= listing.rating.toFixed(1) %></small>
+                        </div>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  <% } %>
+</div>
 
 <script>
-  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-  taxSwitch.addEventListener("click", () => {
-    let taxInfo = document.getElementsByClassName("tax-info");
-    for (info of taxInfo) {
-      if (info.style.display != "inline") {
-        info.style.display = "inline";
-      } else {
-        info.style.display = "none";
-      }
+// Category filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const categoryFilter = document.getElementById('categoryFilter');
+  const sortFilter = document.getElementById('sortFilter');
+  const filterCards = document.querySelectorAll('.filter-card');
+  
+  // Handle category filter change
+  categoryFilter.addEventListener('change', function() {
+    const category = this.value;
+    const sort = sortFilter.value;
+    updateURL(category, sort);
+  });
+  
+  // Handle sort filter change
+  sortFilter.addEventListener('change', function() {
+    const category = categoryFilter.value;
+    const sort = this.value;
+    updateURL(category, sort);
+  });
+  
+  // Handle filter card clicks
+  filterCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const category = this.dataset.category;
+      categoryFilter.value = category;
+      const sort = sortFilter.value;
+      updateURL(category, sort);
+    });
+  });
+  
+  function updateURL(category, sort) {
+    let url = '/listings?';
+    if (category && category !== 'All') {
+      url += `category=${encodeURIComponent(category)}&`;
+    }
+    if (sort && sort !== 'newest') {
+      url += `sort=${encodeURIComponent(sort)}`;
+    }
+    window.location.href = url;
+  }
+  
+  // Highlight active category card
+  const activeCategory = '<%= selectedCategory %>';
+  filterCards.forEach(card => {
+    if (card.dataset.category === activeCategory) {
+      card.classList.add('active');
     }
   });
+});
 </script>
+
+<style>
+.hero-section {
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+  padding: 4rem 0;
+  margin-top: -1.5rem;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filter-card {
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  color: var(--gray-700);
+}
+
+.filter-card:hover,
+.filter-card.active {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.filter-card.active .filter-icon {
+  color: white;
+}
+
+.filter-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.filter-card span {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.tax-toggle-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.listing-card {
+  border: none;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.listing-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.listing-link:hover {
+  color: inherit;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-img-overlay {
+  background: linear-gradient(transparent, rgba(0,0,0,0.1));
+}
+
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .filter-card {
+    padding: 1rem 0.5rem;
+  }
+  
+  .filter-icon {
+    font-size: 1.25rem;
+  }
+  
+  .filter-card span {
+    font-size: 0.75rem;
+  }
+}
+</style>

@@ -37,6 +37,21 @@ module.exports.isOwner = async (req, res, next) => {
   }
 };
 
+// Middleware to check if the user is an admin
+module.exports.isAdmin = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "You must be logged in to access this page!");
+    return res.redirect("/login");
+  }
+  
+  if (!req.user.isAdmin) {
+    req.flash("error", "You must be an admin to access this page!");
+    return res.redirect("/");
+  }
+  
+  next();
+};
+
 // Middleware to validate listing data using Joi schema
 module.exports.validateListing = (req, res, next) => {
   const { error } = listingSchema.validate(req.body);

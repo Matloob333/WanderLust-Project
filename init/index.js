@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const initData = require("./data.js");
+const { sampleListings } = require("./data.js");
 const Listing = require("../models/listing.js");
 const Review = require("../models/review.js");
 
@@ -40,13 +40,13 @@ async function main() {
 const initDB = async () => {
   try {
     await Listing.deleteMany({});
-    initData.data = initData.data.map((obj) => ({
+    const listingsWithOwner = sampleListings.map((obj) => ({
       ...obj,
       owner: "6797e29fec7d941e999531a9", 
     }));
-    console.log(initData.data);
+    console.log("Processed listings:", listingsWithOwner.length);
 
-    await Listing.insertMany(initData.data);
+    await Listing.insertMany(listingsWithOwner);
     console.log("Data was initialized successfully");
   } catch (error) {
     console.error("Error during database initialization:", error);
@@ -62,6 +62,6 @@ const clearReviews = async () => {
   }
 };
 
-module.exports = { clearReviews, initDB };
+// module.exports = { clearReviews, initDB };
 initDB();
 

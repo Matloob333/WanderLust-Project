@@ -1,0 +1,226 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-lg">
+        <div class="card-header bg-success text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-credit-card me-2"></i>
+            Complete Your Payment
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <!-- Demo Mode Warning -->
+          <% if (paymentData && paymentData.key === 'test_key') { %>
+            <div class="alert alert-warning mb-4">
+              <h5 class="mb-2">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Demo Mode
+              </h5>
+              <p class="mb-0">Payment service is not configured. This is a demonstration booking. In a real application, you would be redirected to a secure payment gateway.</p>
+            </div>
+          <% } %>
+
+          <!-- Booking Summary -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="img-fluid rounded">
+            </div>
+            <div class="col-md-8">
+              <h4 class="text-primary"><%= listing.title %></h4>
+              <p class="text-muted mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <%= listing.location %>
+              </p>
+              
+              <div class="row">
+                <div class="col-6">
+                  <p class="mb-1"><strong>Check-in:</strong></p>
+                  <p class="text-muted"><%= new Date(booking.checkIn).toLocaleDateString() %></p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1"><strong>Check-out:</strong></p>
+                  <p class="text-muted"><%= new Date(booking.checkOut).toLocaleDateString() %></p>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-6">
+                  <p class="mb-1"><strong>Guests:</strong></p>
+                  <p class="text-muted"><%= booking.numberOfGuests %> <%= booking.numberOfGuests === 1 ? 'Guest' : 'Guests' %></p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1"><strong>Nights:</strong></p>
+                  <p class="text-muted"><%= numberOfNights %> <%= numberOfNights === 1 ? 'Night' : 'Nights' %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Breakdown -->
+          <div class="bg-light p-3 rounded mb-4">
+            <h6 class="text-primary mb-3">
+              <i class="fas fa-calculator me-2"></i>
+              Payment Summary
+            </h6>
+            <div class="row">
+              <div class="col-6">Base Price (<%= numberOfNights %> nights)</div>
+              <div class="col-6 text-end">₹<%= listing.price * numberOfNights %></div>
+            </div>
+            <% if (booking.numberOfGuests > 2) { %>
+            <div class="row">
+              <div class="col-6">Guest Surcharge</div>
+              <div class="col-6 text-end">₹<%= (booking.numberOfGuests - 2) * 500 %></div>
+            </div>
+            <% } %>
+            <div class="row">
+              <div class="col-6">Taxes (18% GST)</div>
+              <div class="col-6 text-end">₹<%= Math.round((listing.price * numberOfNights) * 0.18) %></div>
+            </div>
+            <div class="row">
+              <div class="col-6">Service Charge (5%)</div>
+              <div class="col-6 text-end">₹<%= Math.round((listing.price * numberOfNights) * 0.05) %></div>
+            </div>
+            <hr>
+            <div class="row fw-bold">
+              <div class="col-6">Total Amount</div>
+              <div class="col-6 text-end text-success">₹<%= booking.totalAmount %></div>
+            </div>
+          </div>
+
+          <!-- Payment Options -->
+          <div class="text-center mb-4">
+            <h5 class="text-primary mb-3">Choose Payment Method</h5>
+            <div class="d-flex justify-content-center gap-3 mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay" checked>
+                <label class="form-check-label" for="razorpay">
+                  <i class="fas fa-credit-card me-2"></i>
+                  Credit/Debit Card
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                <label class="form-check-label" for="upi">
+                  <i class="fas fa-mobile-alt me-2"></i>
+                  UPI
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="netbanking" value="netbanking">
+                <label class="form-check-label" for="netbanking">
+                  <i class="fas fa-university me-2"></i>
+                  Net Banking
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Button -->
+          <div class="text-center">
+            <% if (paymentData && paymentData.key === 'test_key') { %>
+              <!-- Demo Mode - Simulate Payment Success -->
+              <form method="POST" action="/bookings/payment/success">
+                <input type="hidden" name="razorpay_order_id" value="<%= paymentData.order_id %>">
+                <input type="hidden" name="razorpay_payment_id" value="demo_payment_<%= Date.now() %>">
+                <input type="hidden" name="razorpay_signature" value="demo_signature">
+                <button type="submit" class="btn btn-success btn-lg px-5">
+                  <i class="fas fa-check me-2"></i>
+                  Complete Demo Booking
+                </button>
+              </form>
+            <% } else { %>
+              <button id="payButton" class="btn btn-success btn-lg px-5">
+                <i class="fas fa-lock me-2"></i>
+                Pay Securely ₹<%= booking.totalAmount %>
+              </button>
+            <% } %>
+            <p class="text-muted mt-2">
+              <i class="fas fa-shield-alt me-2"></i>
+              Your payment is secured by Razorpay
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (paymentData && paymentData.key !== 'test_key') { %>
+<!-- Razorpay Integration -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('payButton').addEventListener('click', function() {
+  const options = {
+    key: '<%= paymentData.key %>',
+    amount: <%= paymentData.amount %>,
+    currency: '<%= paymentData.currency %>',
+    name: '<%= paymentData.name %>',
+    description: '<%= paymentData.description %>',
+    order_id: '<%= paymentData.order_id %>',
+    prefill: {
+      name: '<%= paymentData.prefill.name %>',
+      email: '<%= paymentData.prefill.email %>',
+      contact: '<%= paymentData.prefill.contact %>'
+    },
+    notes: {
+      booking_id: '<%= paymentData.notes.booking_id %>',
+      user_id: '<%= paymentData.notes.user_id %>',
+      listing_id: '<%= paymentData.notes.listing_id %>'
+    },
+    theme: {
+      color: '<%= paymentData.theme.color %>'
+    },
+    handler: function(response) {
+      // Handle successful payment
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/bookings/payment/success';
+      
+      const fields = {
+        'razorpay_order_id': response.razorpay_order_id,
+        'razorpay_payment_id': response.razorpay_payment_id,
+        'razorpay_signature': response.razorpay_signature
+      };
+      
+      for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+      
+      document.body.appendChild(form);
+      form.submit();
+    },
+    modal: {
+      ondismiss: function() {
+        // Handle payment modal dismissal
+        console.log('Payment modal dismissed');
+      }
+    }
+  };
+  
+  const rzp = new Razorpay(options);
+  rzp.open();
+  
+  rzp.on('payment.failed', function(response) {
+    // Handle payment failure
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/bookings/payment/failure';
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'razorpay_order_id';
+    input.value = '<%= paymentData.order_id %>';
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    form.submit();
+  });
+});
+</script>
+<% } %> 

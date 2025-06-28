@@ -1,0 +1,35 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Edit Review</h3>
+        </div>
+        <div class="card-body">
+          <form action="/listings/<%= review.listing %>/reviews/<%= review._id %>?_method=PUT" method="POST">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating</label>
+              <select class="form-select" id="rating" name="review[rating]" required>
+                <option value="1" <%= review.rating === 1 ? 'selected' : '' %>>1 - Poor</option>
+                <option value="2" <%= review.rating === 2 ? 'selected' : '' %>>2 - Fair</option>
+                <option value="3" <%= review.rating === 3 ? 'selected' : '' %>>3 - Good</option>
+                <option value="4" <%= review.rating === 4 ? 'selected' : '' %>>4 - Very Good</option>
+                <option value="5" <%= review.rating === 5 ? 'selected' : '' %>>5 - Excellent</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Comment</label>
+              <textarea class="form-control" id="comment" name="review[comment]" rows="4" required><%= review.comment %></textarea>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Update Review</button>
+              <a href="/listings/<%= review.listing %>" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

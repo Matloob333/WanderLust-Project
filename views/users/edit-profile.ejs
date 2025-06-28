@@ -1,0 +1,296 @@
+<% layout("/layouts/boilerplate")%>
+
+<style>
+.avatar-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-upload-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.1);
+}
+
+.avatar-upload-btn i {
+  font-size: 14px;
+}
+
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.file-input-wrapper input[type=file] {
+  position: absolute;
+  left: -9999px;
+}
+
+.file-input-label {
+  display: block;
+  padding: 10px 15px;
+  background: var(--primary-color);
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.file-input-label:hover {
+  background: var(--primary-dark);
+}
+
+.avatar-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-remove-avatar {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.btn-remove-avatar:hover {
+  background: #dc2626;
+}
+</style>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Edit Profile</h3>
+        </div>
+        <div class="card-body">
+          <form action="/profile/edit?_method=PUT" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <!-- Avatar Section -->
+            <div class="text-center mb-4">
+              <div class="avatar-container">
+                <% if (currUser && currUser.avatar && currUser.avatar.url) { %>
+                  <img src="<%= currUser.avatar.url %>" alt="<%= currUser.username %>" class="avatar-image">
+                <% } else { %>
+                  <div class="avatar-initials" style="background: linear-gradient(135deg, <%= currUser.avatarColor %>, <%= currUser.avatarColor %>dd);">
+                    <%= currUser.avatarInitials %>
+                  </div>
+                <% } %>
+                <button type="button" class="avatar-upload-btn" onclick="document.getElementById('avatar-input').click();" title="Upload Photo">
+                  <i class="fa-solid fa-camera"></i>
+                </button>
+              </div>
+              
+              <!-- Avatar Actions -->
+              <div class="avatar-actions">
+                <div class="file-input-wrapper">
+                  <label for="avatar-input" class="file-input-label">
+                    <i class="fa-solid fa-upload me-2"></i>Upload Photo
+                  </label>
+                  <input type="file" id="avatar-input" name="avatar" accept="image/*" style="display: none;">
+                </div>
+                
+                <% if (currUser && currUser.avatar && currUser.avatar.url) { %>
+                  <button type="button" class="btn-remove-avatar" onclick="removeAvatar()">
+                    <i class="fa-solid fa-trash me-2"></i>Remove
+                  </button>
+                <% } %>
+              </div>
+              
+              <small class="text-muted d-block mt-2">Max file size: 5MB. Supported formats: JPG, PNG, GIF</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="username" 
+                name="username" 
+                value="<%= currUser ? currUser.username : '' %>" 
+                required
+                minlength="3"
+                maxlength="30"
+              />
+              <div class="invalid-feedback">Please provide a valid username (3-30 characters).</div>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email" 
+                value="<%= currUser ? currUser.email : '' %>" 
+                required
+              />
+              <div class="invalid-feedback">Please provide a valid email address.</div>
+            </div>
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="phone" 
+                name="phone" 
+                value="<%= currUser && currUser.phone ? currUser.phone : '' %>" 
+                pattern="[0-9]{10}"
+                placeholder="1234567890"
+              />
+              <div class="invalid-feedback">Please provide a valid 10-digit phone number.</div>
+            </div>
+            <div class="mb-3">
+              <label for="bio" class="form-label">Bio</label>
+              <textarea 
+                class="form-control" 
+                id="bio" 
+                name="bio" 
+                rows="3"
+                maxlength="500"
+                placeholder="Tell us about yourself..."
+              ><%= currUser && currUser.bio ? currUser.bio : '' %></textarea>
+              <div class="form-text">Maximum 500 characters</div>
+            </div>
+            
+            <!-- Hidden input for avatar removal -->
+            <input type="hidden" id="remove-avatar" name="removeAvatar" value="false">
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Update Profile</button>
+              <a href="/profile" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Form validation
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+
+// File input change handler
+document.getElementById('avatar-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      this.value = '';
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB.');
+      this.value = '';
+      return;
+    }
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const avatarContainer = document.querySelector('.avatar-container');
+      const existingImage = avatarContainer.querySelector('.avatar-image');
+      const existingInitials = avatarContainer.querySelector('.avatar-initials');
+      
+      if (existingImage) {
+        existingImage.src = e.target.result;
+      } else if (existingInitials) {
+        existingInitials.style.display = 'none';
+        const newImage = document.createElement('img');
+        newImage.src = e.target.result;
+        newImage.alt = 'Profile Preview';
+        newImage.className = 'avatar-image';
+        avatarContainer.insertBefore(newImage, existingInitials);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Remove avatar function
+function removeAvatar() {
+  if (confirm('Are you sure you want to remove your profile photo?')) {
+    document.getElementById('remove-avatar').value = 'true';
+    const avatarContainer = document.querySelector('.avatar-container');
+    const existingImage = avatarContainer.querySelector('.avatar-image');
+    const existingInitials = avatarContainer.querySelector('.avatar-initials');
+    
+    if (existingImage) {
+      existingImage.remove();
+    }
+    
+    if (existingInitials) {
+      existingInitials.style.display = 'flex';
+    }
+    
+    // Clear file input
+    document.getElementById('avatar-input').value = '';
+  }
+}
+</script> 

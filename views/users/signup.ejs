@@ -1,41 +1,193 @@
 <% layout("/layouts/boilerplate")%>
 
-<div class="row mt-3">
-  <h1 class="col-6 offset-3">SignUp with WanderLust</h1>
-  <div class="col-6 offset-3">
-    <form action="/signup" method="post" class="needs-validation" novalidate>
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input
-          name="username"
-          id="username"
-          class="form-control"
-          required
-          type="text"
-        />
-        <div class="valid-feedback">Looks good!</div>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h3 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>
+            Join WanderLust
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <!-- Google OAuth Button -->
+          <div class="text-center mb-4">
+            <a href="/auth/google" class="btn btn-outline-danger btn-lg w-100 mb-3">
+              <i class="fab fa-google me-2"></i>
+              Continue with Google
+            </a>
+            <div class="text-muted">
+              <small>or sign up with email</small>
+            </div>
+          </div>
+
+          <form action="/signup" method="post" id="signupForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="username" class="form-label">
+                <i class="fas fa-user me-2"></i>
+                Username
+              </label>
+              <input
+                name="username"
+                id="username"
+                class="form-control"
+                required
+                type="text"
+                minlength="3"
+                maxlength="30"
+                placeholder="Enter your username"
+              />
+              <div class="invalid-feedback">
+                Please enter a valid username (3-30 characters).
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope me-2"></i>
+                Email
+              </label>
+              <input
+                name="email"
+                id="email"
+                class="form-control"
+                required
+                type="email"
+                placeholder="Enter your email"
+              />
+              <div class="invalid-feedback">
+                Please enter a valid email address.
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="phone" class="form-label">
+                <i class="fas fa-phone me-2"></i>
+                Phone Number (Optional)
+              </label>
+              <input
+                name="phone"
+                id="phone"
+                class="form-control"
+                type="tel"
+                pattern="[0-9]{10}"
+                placeholder="Enter 10-digit phone number"
+              />
+              <div class="form-text">
+                We'll use this for booking confirmations and support.
+              </div>
+              <div class="invalid-feedback">
+                Please enter a valid 10-digit phone number.
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="password" class="form-label">
+                <i class="fas fa-lock me-2"></i>
+                Password
+              </label>
+              <input
+                name="password"
+                id="password"
+                class="form-control"
+                required
+                type="password"
+                minlength="6"
+                placeholder="Enter your password"
+              />
+              <div class="form-text">
+                Password must be at least 6 characters long.
+              </div>
+              <div class="invalid-feedback">
+                Please enter a password (minimum 6 characters).
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label">
+                <i class="fas fa-lock me-2"></i>
+                Confirm Password
+              </label>
+              <input
+                name="confirmPassword"
+                id="confirmPassword"
+                class="form-control"
+                required
+                type="password"
+                minlength="6"
+                placeholder="Confirm your password"
+              />
+              <div class="invalid-feedback">
+                Passwords do not match.
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary btn-lg" type="submit">
+                <i class="fas fa-user-plus me-2"></i>
+                Create Account
+              </button>
+              <a href="/login" class="btn btn-outline-secondary">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Already have an account? Log in
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">email</label>
-        <input
-          name="email"
-          id="email"
-          class="form-control"
-          required
-          type="email"
-        />
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">password</label>
-        <input
-          name="password"
-          id="password"
-          class="form-control"
-          required
-          type="password"
-        />
-      </div>
-      <button class="btn btn-success mb-3">Signup </button>
-    </form>
+    </div>
   </div>
 </div>
+
+<script>
+// Form validation
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+
+// Password confirmation validation
+document.getElementById('confirmPassword').addEventListener('input', function() {
+  const password = document.getElementById('password').value;
+  const confirmPassword = this.value;
+  
+  if (password !== confirmPassword) {
+    this.setCustomValidity('Passwords do not match');
+  } else {
+    this.setCustomValidity('');
+  }
+});
+
+// Phone number formatting
+document.getElementById('phone').addEventListener('input', function(e) {
+  // Remove any non-numeric characters
+  this.value = this.value.replace(/[^0-9]/g, '');
+  
+  // Limit to 10 digits
+  if (this.value.length > 10) {
+    this.value = this.value.slice(0, 10);
+  }
+});
+
+// Debug form submission
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+  console.log('Signup form submitted');
+  console.log('Username:', document.getElementById('username').value);
+  console.log('Email:', document.getElementById('email').value);
+  console.log('Phone:', document.getElementById('phone').value);
+  console.log('Password:', document.getElementById('password').value);
+  console.log('Confirm Password:', document.getElementById('confirmPassword').value);
+});
+</script>
