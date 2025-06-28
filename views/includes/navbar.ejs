@@ -130,7 +130,7 @@
             </a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="userDropdown">
               <% if (currUser.avatar && currUser.avatar.url) { %>
                 <img src="<%= currUser.avatar.url %>" alt="<%= currUser.username %>" class="navbar-avatar me-2">
               <% } else { %>
@@ -145,7 +145,7 @@
               <% } %>
               <span><%= currUser.username %></span>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end" id="userDropdownMenu">
               <li>
                 <a class="dropdown-item" href="/profile">
                   <i class="fa-solid fa-user me-2"></i>Profile

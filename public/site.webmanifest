@@ -1,0 +1,16 @@
+{
+  "name": "WanderLust - Discover Amazing Places",
+  "short_name": "WanderLust",
+  "description": "Discover amazing places and create unforgettable memories with WanderLust",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/"
+} 
